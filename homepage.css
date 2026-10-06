@@ -472,6 +472,19 @@ html[data-theme="homepage"] {
   border-radius: 0;
 }
 
+[data-theme="homepage"] .btn {
+  line-height: calc(16px * var(--hp-scale));
+}
+
+[data-theme="homepage"] .color span {
+  line-height: calc(16px * var(--hp-scale));
+}
+
+[data-theme="homepage"] .placeholder {
+  font-size: calc(12px * var(--hp-scale));
+  line-height: calc(20px * var(--hp-scale));
+}
+
 [data-theme="homepage"] .terminal code {
   font-size: calc(12px * var(--hp-scale));
   line-height: calc(20px * var(--hp-scale));

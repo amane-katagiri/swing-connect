@@ -371,7 +371,7 @@ details.hex[open] summary {
 }
 
 [data-copy] {
-  min-width: 9em;
+  min-width: 10em;
 }
 
 .btn-primary {
@@ -1148,12 +1148,11 @@ details.hex[open] summary {
 }
 
 .banner-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
 }
 
 .banner-actions .btn {
-  flex: 1 1 auto;
   min-width: 0;
 }

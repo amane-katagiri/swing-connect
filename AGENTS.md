@@ -12,4 +12,8 @@ swing-connect（SWING でサイトをミラーしてもらうためのリンク�
 - 設定を増やすときは `config.js`・`build.mjs`・`.env.example`・`.github/workflows/pages.yml`・README を同じ変更で更新する。
 - `node --test` を通す。テストで外部ネットワークに接続しない。
 - 見た目を変えたら、ローカルで配信してライト・ダーク・幅 375px で表示を確かめる。
-- `assets/slides/` の画像は SWING のダッシュボードの画面から撮る。ファイル名を変えたら `app.js` の `STEPS` も直す。
+- `assets/slides/` の画像は SWING のダッシュボードの画面と合わせる。SWING 側の見た目や文言（デスクトップ画面の「ミラー」ボタン・「ミラーに追加」ダイアログ・トレイのメニューなど）が変わったら、`assets/slides/README.md` の手順で撮り直す。撮るのは SWING のデモ環境（`docker/demo/demo.sh`）だけで、実鍵・実 relay は使わない。
+- スライドの説明文（`app.js` の `STEPS`）は画像の中身と対応させる。画像を撮り直したら説明文も確かめ、ファイル名を変えたら `STEPS` も直す。
+- ページ上の呼び方をそろえる（「デスクトップ画面」「トレイユーティリティ」など）。
+- ビルドで `dist/` に入るのは `assets/slides/` の PNG だけ。`assets/slides/src/`（撮影用の HTML・スクリプト・フォント）と `README.md` は公開しない。
+- ドキュメントに環境依存の情報（特定マシンの絶対パス・デモの鍵・ユーザー名など）を書かない。

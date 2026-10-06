@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ja" data-theme="homepage">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="no-referrer">
+<title>SWING Connect</title>
+<link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="homepage.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<div class="page">
+  <header class="top modern-only">
+    <a class="brand" id="brand-link" href="https://github.com/amane-katagiri/swing">
+      <img class="logo-light" src="assets/swing-lockup.svg" alt="SWING" width="118" height="24">
+      <img class="logo-dark" src="assets/swing-lockup-dark.svg" alt="SWING" width="118" height="24">
+    </a>
+  </header>
+
+  <main id="main">
+    <noscript><p class="alert alert-warn">このページの表示には JavaScript が必要です。</p></noscript>
+
+    <section id="connect" class="view" hidden>
+      <div class="hero">
+        <p class="greeting hp-only">SWING ミラー受付ページへようこそ！</p>
+        <h1 id="title"></h1>
+        <p id="description" class="lead"></p>
+      </div>
+
+      <p class="install">
+        <a class="btn btn-primary btn-large" id="swing-link" href="https://github.com/amane-katagiri/swing" target="_blank" rel="noopener noreferrer">SWING をインストールする <span aria-hidden="true">→</span></a>
+      </p>
+
+      <div class="rainbow hp-only" aria-hidden="true"></div>
+      <div class="marquee hp-only" aria-hidden="true">
+        <div class="marquee-track"><span>最新更新情報: ★ ミラー受付中！ 公開鍵をコピーして、SWING のミラーに追加してね ★ 相互ミラー大歓迎 ★</span></div>
+      </div>
+      <nav class="sitemenu hp-only" aria-label="ページ内メニュー">
+        <ul>
+          <li><a href="#key">[ 公開鍵 ]</a></li>
+          <li><a href="#howto">[ ミラーのしかた ]</a></li>
+        </ul>
+      </nav>
+
+      <div class="card key-card" id="key">
+        <div class="key-head">
+          <span class="eyebrow">公開鍵 <span class="eyebrow-sub">npub</span></span>
+          <span id="nip05-badge" class="badge" hidden>
+            <span class="badge-icon" aria-hidden="true"></span>
+            <span class="badge-id" id="nip05-id"></span>
+            <span class="badge-state" id="nip05-state"></span>
+          </span>
+        </div>
+        <div class="copy-row">
+          <code id="npub" class="key"></code>
+          <button type="button" class="btn btn-primary" data-copy="npub">コピー</button>
+        </div>
+        <p id="nip05-note" class="note" hidden></p>
+        <details class="hex">
+          <summary>hex 形式で見る</summary>
+          <div class="copy-row">
+            <code id="hex" class="key key-small"></code>
+            <button type="button" class="btn" data-copy="hex">コピー</button>
+          </div>
+        </details>
+      </div>
+
+      <div id="nip05-alert" class="alert alert-danger" role="alert" hidden>
+        <strong>NIP-05 の公開鍵と一致しません</strong>
+        <p id="nip05-alert-text"></p>
+      </div>
+
+      <section class="block" id="howto" aria-labelledby="cli-heading">
+        <div class="block-head">
+          <span class="num" aria-hidden="true">A</span>
+          <h2 id="cli-heading">コマンドでミラーする</h2>
+        </div>
+        <p>SWING をインストールしたマシンで、次のコマンドを実行します。</p>
+        <div class="copy-row terminal">
+          <code><span class="prompt" aria-hidden="true">$ </span><span id="command"></span></code>
+          <button type="button" class="btn btn-on-dark" data-copy="command">コピー</button>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="dash-heading">
+        <div class="block-head">
+          <span class="num" aria-hidden="true">B</span>
+          <h2 id="dash-heading">ダッシュボードからミラーする</h2>
+        </div>
+        <p>上の公開鍵をコピーしてから、ダッシュボードで次の手順を進めます。</p>
+
+        <div class="window" id="slides" role="region" aria-roledescription="スライドショー" aria-label="ダッシュボードからミラーする手順" tabindex="0">
+          <div class="window-title">
+            <span class="window-name">ミラーの手順</span>
+            <span class="window-count" id="slide-count"></span>
+            <span class="window-controls" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+          <div class="step-bar">
+            <div class="tabs" id="open-tabs" role="tablist" aria-label="ダッシュボードの開き方">
+              <button type="button" role="tab" id="tab-cli" data-variant="cli" aria-controls="slide-view">コマンドで開く</button>
+              <button type="button" role="tab" id="tab-tray" data-variant="tray" aria-controls="slide-view">タスクトレイから開く</button>
+            </div>
+            <p class="step-title" id="step-title" hidden></p>
+          </div>
+          <div class="viewport" id="slide-view">
+            <figure class="frame" id="slide-frame">
+              <img id="slide-img" alt="" width="1280" height="800" decoding="async">
+              <figcaption class="placeholder" id="slide-placeholder" aria-hidden="true"><span>画像を準備中です</span></figcaption>
+            </figure>
+          </div>
+          <p class="caption" id="slide-caption" aria-live="polite"></p>
+          <div class="controls">
+            <button type="button" class="btn-95" id="slide-prev" aria-label="前の手順"><span aria-hidden="true">◀</span> 前へ</button>
+            <div class="dots" id="slide-dots"></div>
+            <button type="button" class="btn-95" id="slide-next" aria-label="次の手順">次へ <span aria-hidden="true">▶</span></button>
+          </div>
+        </div>
+      </section>
+
+    </section>
+
+    <section id="builder" class="view" hidden>
+      <div class="hero">
+        <p class="greeting hp-only">リンク作成コーナーへようこそ！</p>
+        <h1>SWING Connect のリンクを作る</h1>
+        <p class="lead">自分のサイトに置くリンクを作ります。リンクを開いた人は、あなたの公開鍵をコピーして、SWING であなたのサイトをミラーできます。</p>
+      </div>
+
+      <div class="rainbow hp-only" aria-hidden="true"></div>
+      <div class="marquee hp-only" aria-hidden="true">
+        <div class="marquee-track"><span>★ リンク作成コーナー ★ 公開鍵を入れると、あなた専用のミラー受付リンクができます ★ 相互リンク歓迎 ★</span></div>
+      </div>
+
+      <div id="error" class="alert alert-danger" role="alert" hidden>
+        <strong id="error-title"></strong>
+        <p id="error-text"></p>
+      </div>
+
+      <form class="card form" id="builder-form" novalidate>
+        <div class="field">
+          <label for="b-key">公開鍵 <span class="req">必須</span></label>
+          <input id="b-key" name="key" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="npub1… / nprofile1… / 64 文字の hex" aria-describedby="b-key-msg">
+          <p class="field-msg" id="b-key-msg">SWING で公開に使っている鍵の公開鍵です。</p>
+        </div>
+        <div class="field" id="b-nip05-field">
+          <label for="b-nip05">NIP-05 のドメイン <span class="opt">任意</span></label>
+          <input id="b-nip05" name="nip05" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="example.com" aria-describedby="b-nip05-msg">
+          <p class="field-msg" id="b-nip05-msg"><code>https://ドメイン/.well-known/nostr.json</code> の <code>_</code> にこの公開鍵を載せていれば、確認済みと表示されます。</p>
+        </div>
+        <fieldset class="field colors" id="b-colors">
+          <legend>色 <span class="opt">任意</span></legend>
+          <label class="check"><input type="checkbox" id="b-color-on"> 色を指定する</label>
+          <div class="color-pair">
+            <label class="color"><input type="color" id="b-light" disabled><span>ライトモード <code id="b-light-hex"></code></span></label>
+            <label class="color"><input type="color" id="b-dark" disabled><span>ダークモード <code id="b-dark-hex"></code></span></label>
+          </div>
+        </fieldset>
+        <div class="field" id="b-scheme">
+          <span class="field-label" id="b-scheme-label">プレビューの配色</span>
+          <div class="segmented" role="group" aria-labelledby="b-scheme-label" aria-describedby="b-scheme-msg">
+            <button type="button" class="btn" data-scheme-choice="" aria-pressed="true">自動</button>
+            <button type="button" class="btn" data-scheme-choice="light" aria-pressed="false">ライト</button>
+            <button type="button" class="btn" data-scheme-choice="dark" aria-pressed="false">ダーク</button>
+          </div>
+          <p class="field-msg" id="b-scheme-msg">このページの見た目だけを切り替えて、ライトモードとダークモードの色を確かめられます。リンクには含まれません。</p>
+        </div>
+      </form>
+
+      <div class="card result" id="b-result">
+        <span class="eyebrow">できたリンク</span>
+        <p class="note result-hint" id="b-hint" aria-live="polite">公開鍵を入れると、リンクと HTML がここにできます。</p>
+        <div id="b-outputs" hidden>
+          <div class="copy-row">
+            <code id="b-url" class="key key-small"></code>
+            <button type="button" class="btn btn-primary" data-copy="b-url">コピー</button>
+          </div>
+          <div class="result-actions">
+            <a class="btn" id="b-preview" target="_blank" rel="noopener">プレビューを開く <span aria-hidden="true">↗</span></a>
+          </div>
+          <details class="hex">
+            <summary>サイトに貼る HTML</summary>
+            <div class="copy-row">
+              <code id="b-html" class="key key-small"></code>
+              <button type="button" class="btn" data-copy="b-html">コピー</button>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="rainbow hp-only" aria-hidden="true"></div>
+  <footer class="foot">
+    <p class="counter-row hp-only" aria-hidden="true">あなたは <span class="counter" id="counter">000000</span> 人目のお客様です</p>
+    <a class="banner-link hp-only" id="banner-link" href="https://github.com/amane-katagiri/swing" target="_blank" rel="noopener noreferrer"><img src="assets/swing-banner.gif" width="88" height="31" alt="JOIN SWING NETWORK!（SWING のページへ）"></a>
+    <p class="linkfree hp-only">相互リンク歓迎！リンクフリーです。</p>
+    <a id="builder-link" href="./" hidden>このページへのリンクを作る</a>
+    <span>SWING Connect</span>
+  </footer>
+  <p class="sr-only" id="announce" aria-live="polite"></p>
+</div>
+</body>
+</html>

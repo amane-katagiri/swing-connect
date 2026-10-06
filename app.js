@@ -1,6 +1,6 @@
 import config from "./config.js";
 import { npubFromHex, parseKey } from "./lib/nip19.js";
-import { palette, parseAllowedKeys, parseColor, parseNip05Param, parseTheme, resolveKey } from "./lib/validate.js";
+import { bannerFileName, palette, parseAllowedKeys, parseBannerEntry, parseColor, parseNip05Param, parseTheme, resolveKey } from "./lib/validate.js";
 
 const $ = (id) => document.getElementById(id);
 const NIP05_TIMEOUT_MS = 10000;
@@ -80,24 +80,26 @@ async function copyText(text) {
 }
 
 function setupCopyButtons() {
-  for (const button of document.querySelectorAll("[data-copy]")) {
-    const label = button.textContent;
-    let timer = 0;
-    button.addEventListener("click", async () => {
-      const source = $(button.dataset.copy);
-      const text = source.dataset.value ?? source.textContent;
-      if (button.closest("[hidden]") || text.trim() === "") return;
-      const ok = await copyText(text);
-      button.textContent = ok ? "コピーしました" : "コピーできませんでした";
-      button.classList.toggle("is-copied", ok);
-      announce(ok ? "コピーしました" : "コピーできませんでした。テキストを選択してコピーしてください");
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        button.textContent = label;
-        button.classList.remove("is-copied");
-      }, 1800);
-    });
-  }
+  for (const button of document.querySelectorAll("[data-copy]")) bindCopyButton(button);
+}
+
+function bindCopyButton(button) {
+  const label = button.textContent;
+  let timer = 0;
+  button.addEventListener("click", async () => {
+    const source = $(button.dataset.copy);
+    const text = source.dataset.value ?? source.textContent;
+    if (button.closest("[hidden]") || text.trim() === "") return;
+    const ok = await copyText(text);
+    button.textContent = ok ? "コピーしました" : "コピーできませんでした";
+    button.classList.toggle("is-copied", ok);
+    announce(ok ? "コピーしました" : "コピーできませんでした。テキストを選択してコピーしてください");
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      button.textContent = label;
+      button.classList.remove("is-copied");
+    }, 1800);
+  });
 }
 
 async function fetchNip05(domain, hex) {
@@ -366,10 +368,99 @@ function setupSchemeToggle() {
   }
 }
 
+function bannerUrls() {
+  const urls = [];
+  for (const entry of Array.isArray(config.banners) ? config.banners : []) {
+    const banner = parseBannerEntry(entry);
+    if (!banner) continue;
+    try {
+      const url = new URL(banner, location.href);
+      if ((url.protocol === "https:" || url.protocol === "http:") && !urls.includes(url.href)) urls.push(url.href);
+    } catch {}
+  }
+  return urls;
+}
+
+function setupBanners() {
+  const items = bannerUrls().map((src, i) => {
+    const li = document.createElement("li");
+    li.className = "banner-item";
+    const preview = document.createElement("div");
+    preview.className = "banner-preview";
+    const img = document.createElement("img");
+    img.alt = "SWING でミラーする";
+    img.decoding = "async";
+    img.src = src;
+    preview.append(img);
+    const row = document.createElement("div");
+    row.className = "copy-row";
+    const code = document.createElement("code");
+    code.className = "key key-small";
+    code.id = `b-banner-${i}`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn";
+    button.dataset.copy = code.id;
+    button.textContent = "コピー";
+    bindCopyButton(button);
+    const fileName = bannerFileName(src);
+    const download = document.createElement("a");
+    download.className = "btn";
+    download.href = src;
+    download.textContent = "ダウンロード";
+    if (new URL(src).origin === location.origin) {
+      download.download = decodeURIComponent(fileName);
+    } else {
+      download.target = "_blank";
+      download.rel = "noopener noreferrer";
+    }
+    const actions = document.createElement("div");
+    actions.className = "banner-actions";
+    actions.append(button, download);
+    row.append(code, actions);
+    li.append(preview, row);
+    $("b-banner-grid").append(li);
+    return { src, fileName, img, code, size: null };
+  });
+  $("b-banners").hidden = items.length === 0;
+  let current = null;
+
+  function render(href) {
+    current = href;
+    for (const item of items) {
+      if (!href) {
+        item.code.textContent = "";
+        continue;
+      }
+      const a = document.createElement("a");
+      a.setAttribute("href", href);
+      const img = document.createElement("img");
+      img.setAttribute("src", item.fileName);
+      img.setAttribute("alt", "SWING でミラーする");
+      if (item.size) {
+        img.setAttribute("width", String(item.size[0]));
+        img.setAttribute("height", String(item.size[1]));
+      }
+      a.append(img);
+      item.code.textContent = a.outerHTML;
+    }
+  }
+
+  for (const item of items) {
+    item.img.addEventListener("load", () => {
+      if (item.img.naturalWidth > 0) item.size = [item.img.naturalWidth, item.img.naturalHeight];
+      render(current);
+    });
+  }
+  return render;
+}
+
 function showBuilder(error, params) {
   document.title = "リンクを作る — SWING Connect";
   $("builder").hidden = false;
   $("builder-link").hidden = true;
+  for (const el of document.querySelectorAll(".foot .counter-row, .foot .banner-link, .foot .linkfree")) el.hidden = true;
+  const renderBanners = setupBanners();
 
   const keyInput = $("b-key");
   const nip05Input = $("b-nip05");
@@ -457,6 +548,7 @@ function showBuilder(error, params) {
       htmlEl.textContent = "";
       delete urlEl.dataset.value;
       preview.removeAttribute("href");
+      renderBanners(null);
       return;
     }
     const url = new URL(location.href);
@@ -474,6 +566,7 @@ function showBuilder(error, params) {
     anchor.href = url.href;
     anchor.textContent = "SWING でこのサイトをミラーする";
     htmlEl.textContent = anchor.outerHTML;
+    renderBanners(url.href);
     preview.href = url.href;
     $("b-hint").hidden = true;
     $("b-outputs").hidden = false;

@@ -16,7 +16,7 @@ SWING は Nostr と IPFS で個人サイトをおたがいに保存しあうソ�
 
 ## リンクの作り方
 
-公開鍵を付けずにページを開くと、リンクを作る画面になります。公開鍵・ドメイン・色を入れると、そのままコピーできるリンクと、サイトに貼る HTML ができます。「プレビューの配色」で「ライト」「ダーク」を選ぶと、OS の設定を変えずに両方の色を確かめられます（この切り替えはこの画面だけのもので、リンクには入りません）。
+公開鍵を付けずにページを開くと、リンクを作る画面になります。公開鍵・ドメイン・色を入れると、そのままコピーできるリンクと、サイトに貼る HTML ができます。「プレビューの配色」で「ライト」「ダーク」を選ぶと、OS の設定を変えずに両方の色を確かめられます（この切り替えはこの画面だけのもので、リンクには入りません）。「サイトに貼る HTML」を開くと、バナー画像もダウンロードできます。画像を自分のサイトに置いて使う前提なので、コピーされる HTML の `<img src>` は画像のファイル名だけになります（直リンクにはしません）。バナーは `SWING_CONNECT_BANNERS` で変えられます。
 
 手で書くときは、次の URL パラメータを使います。
 
@@ -52,6 +52,7 @@ https://example.github.io/swing-connect/?key=npub180cvv07tjdrrgpa0j7j7tmnyl2yr6y
 | `SWING_CONNECT_CUSTOM_COLORS` | `true` | `light` / `dark` パラメータで色を変えられるか（`true` / `false`） |
 | `SWING_CONNECT_ALLOWED_KEYS` | （空） | 表示を許す公開鍵。npub・nprofile・hex をスペースかカンマで区切る |
 | `SWING_CONNECT_SWING_URL` | `https://github.com/amane-katagiri/swing` | 「SWING をインストールする」のリンク先 |
+| `SWING_CONNECT_BANNERS` | `assets/swing-banner.gif` | リンク作成画面で配るバナー画像。http(s) の URL か、サイト内の相対パス（`assets/foo.gif` など）をカンマで区切る。`,` だけにするとバナーを出さない |
 
 `SWING_CONNECT_ALLOWED_KEYS` が空ならどの公開鍵でも表示します。公開鍵を書くと、それ以外の公開鍵のリンクはエラーになります。1 つだけ書くと、`key` を付けずに開いたときもその公開鍵のページになるので、自分専用のページとして `?key=…` なしでリンクできます。
 

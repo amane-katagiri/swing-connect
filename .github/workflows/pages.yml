@@ -34,6 +34,7 @@ jobs:
           SWING_CONNECT_CUSTOM_COLORS: ${{ vars.SWING_CONNECT_CUSTOM_COLORS }}
           SWING_CONNECT_ALLOWED_KEYS: ${{ vars.SWING_CONNECT_ALLOWED_KEYS }}
           SWING_CONNECT_SWING_URL: ${{ vars.SWING_CONNECT_SWING_URL }}
+          SWING_CONNECT_BANNERS: ${{ vars.SWING_CONNECT_BANNERS }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

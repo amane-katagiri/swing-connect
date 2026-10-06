@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import defaults from "./config.js";
-import { parseAllowedKeys, parseColor, parseTheme, THEMES } from "./lib/validate.js";
+import { parseAllowedKeys, parseBanners, parseColor, parseTheme, THEMES } from "./lib/validate.js";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const SITE_FILES = ["index.html", "style.css", "homepage.css", "app.js", "lib", "assets"];
@@ -29,7 +29,7 @@ function parseBool(value) {
 
 export function configFromEnv(env) {
   const errors = [];
-  const config = { ...defaults, allowedKeys: [...defaults.allowedKeys] };
+  const config = { ...defaults, allowedKeys: [...defaults.allowedKeys], banners: [...(defaults.banners ?? [])] };
 
   for (const [name, field] of [["TITLE", "title"], ["DESCRIPTION", "description"]]) {
     const v = read(env, name);
@@ -78,6 +78,16 @@ export function configFromEnv(env) {
       errors.push(`${PREFIX}SWING_URL: http(s) の URL を指定してください（"${url}"）`);
     } else {
       config.swingUrl = parsed.href;
+    }
+  }
+
+  const rawBanners = env[`${PREFIX}BANNERS`];
+  if (typeof rawBanners === "string" && rawBanners.trim() !== "") {
+    const { banners, invalid } = parseBanners(rawBanners);
+    if (invalid.length > 0) {
+      errors.push(`${PREFIX}BANNERS: http(s) の URL か、サイト内の相対パス（例: assets/banner.gif）を指定してください: ${invalid.join(" ")}`);
+    } else {
+      config.banners = banners;
     }
   }
 

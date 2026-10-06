@@ -29,6 +29,7 @@ test("every variable is read and normalized", () => {
     SWING_CONNECT_DARK_COLOR: "#ffcc00",
     SWING_CONNECT_ALLOWED_KEYS: `${NPUB}, ${HEX.toUpperCase()}`,
     SWING_CONNECT_SWING_URL: "https://example.com/swing",
+    SWING_CONNECT_BANNERS: " assets/a.gif , https://example.com/x.png ",
   });
   assert.deepEqual({ ...config }, {
     theme: "modern",
@@ -40,6 +41,7 @@ test("every variable is read and normalized", () => {
     darkColor: "#ffcc00",
     allowedKeys: [HEX],
     swingUrl: "https://example.com/swing",
+    banners: ["assets/a.gif", "https://example.com/x.png"],
   });
 });
 
@@ -53,9 +55,10 @@ test("invalid values fail with every problem named", () => {
         SWING_CONNECT_SWING_URL: "javascript:alert(1)",
         SWING_CONNECT_TITLE: "a\u0007b",
         SWING_CONNECT_THEME: "retro",
+        SWING_CONNECT_BANNERS: "assets/ok.gif, javascript:alert(1)",
       }),
     (e) => {
-      for (const name of ["NIP05", "LIGHT_COLOR", "ALLOWED_KEYS", "SWING_URL", "TITLE", "THEME"]) {
+      for (const name of ["NIP05", "LIGHT_COLOR", "ALLOWED_KEYS", "SWING_URL", "TITLE", "THEME", "BANNERS"]) {
         assert.match(e.message, new RegExp(`SWING_CONNECT_${name}:`));
       }
       assert.match(e.message, /npub1broken/);
@@ -122,6 +125,31 @@ test("the theme defaults to homepage and is written into index.html", () => {
       assert.match(html, new RegExp(`<html lang="ja" data-theme="${theme}">`));
       assert.ok(existsSync(join(dir, "homepage.css")));
       assert.ok(existsSync(join(dir, "assets/fonts/pixelmplus12-regular.woff2")));
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+});
+
+test("banners default to the footer banner, and only-empty entries mean none", () => {
+  assert.deepEqual(configFromEnv({}).banners, ["assets/swing-banner.gif"]);
+  assert.deepEqual(configFromEnv({ SWING_CONNECT_BANNERS: "" }).banners, ["assets/swing-banner.gif"]);
+  assert.deepEqual(configFromEnv({ SWING_CONNECT_BANNERS: "," }).banners, []);
+  assert.deepEqual(configFromEnv({ SWING_CONNECT_BANNERS: " , " }).banners, []);
+  assert.throws(() => configFromEnv({ SWING_CONNECT_BANNERS: "//cdn.example/x.gif" }), /SWING_CONNECT_BANNERS:.*\/\/cdn\.example/);
+});
+
+test("build writes the resolved banners into config.js", async () => {
+  for (const [value, expected] of [
+    [undefined, ["assets/swing-banner.gif"]],
+    ["assets/swing-banner.gif, https://example.com/x.png", ["assets/swing-banner.gif", "https://example.com/x.png"]],
+    [",", []],
+  ]) {
+    const dir = mkdtempSync(join(tmpdir(), "swing-connect-"));
+    try {
+      build(dir, value === undefined ? {} : { SWING_CONNECT_BANNERS: value });
+      const mod = await import(`${pathToFileURL(join(dir, "config.js")).href}?${Math.random()}`);
+      assert.deepEqual(mod.default.banners, expected);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

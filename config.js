@@ -8,4 +8,5 @@ export default Object.freeze({
   customColors: true,
   allowedKeys: [],
   swingUrl: "https://github.com/amane-katagiri/swing",
+  banners: ["assets/swing-banner.gif"],
 });

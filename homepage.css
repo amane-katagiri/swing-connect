@@ -714,3 +714,47 @@ html[data-theme="homepage"] {
   border-color: #000000;
   box-shadow: inset 2px 2px 0 rgb(0 0 0 / 35%), inset -2px -2px 0 rgb(255 255 255 / 30%);
 }
+
+[data-theme="homepage"] .banner-corner {
+  margin-top: 10px;
+}
+
+[data-theme="homepage"] .banner-corner-title {
+  font-size: calc(12px * var(--hp-scale));
+  color: var(--ink);
+}
+
+[data-theme="homepage"] .banner-grid {
+  gap: 8px;
+}
+
+[data-theme="homepage"] .banner-item {
+  padding: 8px;
+  gap: 6px;
+  border-color: var(--hp-panel-border);
+  border-radius: 0;
+  background: var(--hp-column);
+}
+
+[data-theme="homepage"] .banner-preview {
+  border-radius: 0;
+  background: var(--hp-panel);
+}
+
+[data-theme="homepage"] .banner-preview img {
+  image-rendering: pixelated;
+}
+
+[data-theme="homepage"] .banner-corner-title {
+  margin-bottom: 2px;
+}
+
+[data-theme="homepage"] .banner-corner-note {
+  margin: 0 0 8px;
+  font-size: calc(12px * var(--hp-scale));
+  color: var(--hp-muted);
+}
+
+[data-theme="homepage"] .banner-actions {
+  gap: 6px;
+}

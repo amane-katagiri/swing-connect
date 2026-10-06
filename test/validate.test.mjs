@@ -8,6 +8,9 @@ import {
   parseColor,
   parseNip05Param,
   parseTheme,
+  parseBannerEntry,
+  parseBanners,
+  bannerFileName,
   resolveKey,
   textOn,
 } from "../lib/validate.js";
@@ -107,4 +110,57 @@ test("themes are homepage or modern only", () => {
   assert.equal(parseTheme("homepage"), "homepage");
   assert.equal(parseTheme(" Modern "), "modern");
   for (const t of ["", "retro", "modern2", null, undefined]) assert.equal(parseTheme(t), null, String(t));
+});
+
+test("banner lists: unset and empty use the default, commas alone mean none", () => {
+  assert.deepEqual(parseBanners(undefined), { banners: ["assets/swing-banner.gif"], invalid: [] });
+  assert.deepEqual(parseBanners(""), { banners: ["assets/swing-banner.gif"], invalid: [] });
+  assert.deepEqual(parseBanners(","), { banners: [], invalid: [] });
+  assert.deepEqual(parseBanners(" , "), { banners: [], invalid: [] });
+});
+
+test("banner lists keep valid entries trimmed and report bad ones", () => {
+  assert.deepEqual(parseBanners(" assets/a.gif ,, https://example.com/x.png, /img/b.png , assets/a.gif"), {
+    banners: ["assets/a.gif", "https://example.com/x.png", "/img/b.png"],
+    invalid: [],
+  });
+  assert.deepEqual(parseBanners("assets/a.gif, javascript:alert(1), //evil.example/x.png").invalid, [
+    "javascript:alert(1)",
+    "//evil.example/x.png",
+  ]);
+});
+
+test("banner entries reject non-http schemes, protocol-relative URLs and backslashes", () => {
+  for (const bad of [
+    "javascript:alert(1)",
+    "JavaScript:alert(1)",
+    "data:image/gif;base64",
+    "ftp://example.com/x.gif",
+    "//example.com/x.gif",
+    "assets\\x.gif",
+    "a b.gif",
+    "",
+    null,
+  ]) {
+    assert.equal(parseBannerEntry(bad), null, String(bad));
+  }
+  assert.equal(parseBannerEntry("HTTPS://Example.com/x.png"), "https://example.com/x.png");
+  assert.equal(parseBannerEntry("assets/swing-banner.gif"), "assets/swing-banner.gif");
+});
+
+test("banner file names come from the last path segment, safely re-encoded", () => {
+  const cases = [
+    ["http://127.0.0.1:8000/assets/swing-banner.gif", "swing-banner.gif"],
+    ["https://example.com/img/x.png?v=2&size=88#top", "x.png"],
+    ["https://example.com/my%20banner.gif", "my%20banner.gif"],
+    ["https://example.com/%E3%83%90%E3%83%8A%E3%83%BC.gif", "%E3%83%90%E3%83%8A%E3%83%BC.gif"],
+    ["https://example.com/x%22onerror%3D.gif", "x%22onerror%3D.gif"],
+    ["https://example.com/img/", "banner.png"],
+    ["https://example.com/", "banner.png"],
+    ["https://example.com/a%2Fb.GIF", "banner.gif"],
+    ["https://example.com/%E0%A4%A.webp", "banner.webp"],
+    ["https://example.com/%2E%2E", "banner.png"],
+    ["not a url", "banner.png"],
+  ];
+  for (const [href, name] of cases) assert.equal(bannerFileName(href), name, href);
 });

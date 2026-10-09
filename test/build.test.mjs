@@ -30,6 +30,7 @@ test("every variable is read and normalized", () => {
     SWING_CONNECT_ALLOWED_KEYS: `${NPUB}, ${HEX.toUpperCase()}`,
     SWING_CONNECT_SWING_URL: "https://example.com/swing",
     SWING_CONNECT_BANNERS: " assets/a.gif , https://example.com/x.png ",
+    SWING_CONNECT_SITE_URL: "https://example.github.io/swing-connect",
   });
   assert.deepEqual({ ...config }, {
     theme: "modern",
@@ -42,6 +43,7 @@ test("every variable is read and normalized", () => {
     allowedKeys: [HEX],
     swingUrl: "https://example.com/swing",
     banners: ["assets/a.gif", "https://example.com/x.png"],
+    siteUrl: "https://example.github.io/swing-connect/",
   });
 });
 
@@ -56,9 +58,10 @@ test("invalid values fail with every problem named", () => {
         SWING_CONNECT_TITLE: "a\u0007b",
         SWING_CONNECT_THEME: "retro",
         SWING_CONNECT_BANNERS: "assets/ok.gif, javascript:alert(1)",
+        SWING_CONNECT_SITE_URL: "https://example.com/?x=1",
       }),
     (e) => {
-      for (const name of ["NIP05", "LIGHT_COLOR", "ALLOWED_KEYS", "SWING_URL", "TITLE", "THEME", "BANNERS"]) {
+      for (const name of ["NIP05", "LIGHT_COLOR", "ALLOWED_KEYS", "SWING_URL", "TITLE", "THEME", "BANNERS", "SITE_URL"]) {
         assert.match(e.message, new RegExp(`SWING_CONNECT_${name}:`));
       }
       assert.match(e.message, /npub1broken/);
@@ -104,13 +107,15 @@ test("a failed build leaves no output", () => {
   assert.ok(!existsSync(dir));
 });
 
-test("only the slide images are shipped from assets/slides", () => {
+test("only the images are shipped from assets/slides and assets/og", () => {
   const dir = mkdtempSync(join(tmpdir(), "swing-connect-"));
   try {
     build(dir, {});
-    for (const f of ["open-cli.png", "desktop.png"]) assert.ok(existsSync(join(dir, "assets/slides", f)), f);
-    assert.ok(!existsSync(join(dir, "assets/slides/src")));
-    assert.ok(!existsSync(join(dir, "assets/slides/README.md")));
+    for (const f of ["slides/open-cli.png", "slides/desktop.png", "og/og.png"]) assert.ok(existsSync(join(dir, "assets", f)), f);
+    for (const d of ["slides", "og"]) {
+      assert.ok(!existsSync(join(dir, "assets", d, "src")));
+      assert.ok(!existsSync(join(dir, "assets", d, "README.md")));
+    }
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -153,5 +158,27 @@ test("build writes the resolved banners into config.js", async () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  }
+});
+
+test("the title and description go into the head, with the card image only when the site URL is known", () => {
+  const dir = mkdtempSync(join(tmpdir(), "swing-connect-"));
+  try {
+    build(dir, { SWING_CONNECT_TITLE: `A "&" <B>`, SWING_CONNECT_DESCRIPTION: "説明" });
+    let html = readFileSync(join(dir, "index.html"), "utf8");
+    assert.match(html, /<title>A &#34;&#38;&#34; &#60;B&#62;<\/title>/);
+    assert.match(html, /<meta property="og:title" content="A &#34;&#38;&#34; &#60;B&#62;">/);
+    assert.match(html, /<meta property="og:description" content="説明">/);
+    assert.match(html, /<meta name="twitter:card" content="summary">/);
+    assert.doesNotMatch(html, /og:image|og:url/);
+    assert.equal(html.match(/<title>/g).length, 1);
+
+    build(dir, { SWING_CONNECT_SITE_URL: "https://example.github.io/swing-connect" });
+    html = readFileSync(join(dir, "index.html"), "utf8");
+    assert.match(html, /<meta property="og:url" content="https:\/\/example\.github\.io\/swing-connect\/">/);
+    assert.match(html, /<meta property="og:image" content="https:\/\/example\.github\.io\/swing-connect\/assets\/og\/og\.png">/);
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });

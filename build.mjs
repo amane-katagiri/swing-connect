@@ -7,12 +7,43 @@ import { parseAllowedKeys, parseBanners, parseColor, parseTheme, THEMES } from "
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const SITE_FILES = ["index.html", "style.css", "homepage.css", "app.js", "lib", "assets"];
 const THEME_ATTR = /(<html\b[^>]*\bdata-theme=")[a-z]+(")/;
+const TITLE_TAG = /<title>[^<]*<\/title>/;
 const PREFIX = "SWING_CONNECT_";
-const SLIDES = join(ROOT, "assets", "slides");
+const IMAGE_DIRS = [join(ROOT, "assets", "slides"), join(ROOT, "assets", "og")];
+const OG_IMAGE = { path: "assets/og/og.png", width: 1200, height: 630, alt: "SWING" };
 
 function shipped(src) {
-  if (src === SLIDES || !src.startsWith(SLIDES)) return true;
-  return dirname(src) === SLIDES && src.endsWith(".png");
+  const dir = IMAGE_DIRS.find((d) => src.startsWith(d));
+  if (!dir || src === dir) return true;
+  return dirname(src) === dir && src.endsWith(".png");
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+}
+
+export function headTags(config) {
+  const meta = (attr, name, content) => `<meta ${attr}="${name}" content="${escapeHtml(String(content))}">`;
+  const tags = [
+    `<title>${escapeHtml(config.title)}</title>`,
+    meta("name", "description", config.description),
+    meta("property", "og:type", "website"),
+    meta("property", "og:title", config.title),
+    meta("property", "og:description", config.description),
+  ];
+  if (config.siteUrl) {
+    tags.push(
+      meta("property", "og:url", config.siteUrl),
+      meta("property", "og:image", new URL(OG_IMAGE.path, config.siteUrl).href),
+      meta("property", "og:image:width", OG_IMAGE.width),
+      meta("property", "og:image:height", OG_IMAGE.height),
+      meta("property", "og:image:alt", OG_IMAGE.alt),
+      meta("name", "twitter:card", "summary_large_image"),
+    );
+  } else {
+    tags.push(meta("name", "twitter:card", "summary"));
+  }
+  return tags.join("\n");
 }
 
 function read(env, name) {
@@ -81,6 +112,19 @@ export function configFromEnv(env) {
     }
   }
 
+  const site = read(env, "SITE_URL");
+  if (site !== null) {
+    let parsed = null;
+    try {
+      parsed = new URL(site.endsWith("/") ? site : `${site}/`);
+    } catch {}
+    if (!parsed || (parsed.protocol !== "https:" && parsed.protocol !== "http:") || parsed.search || parsed.hash) {
+      errors.push(`${PREFIX}SITE_URL: 公開先の http(s) の URL を指定してください（"${site}"）`);
+    } else {
+      config.siteUrl = parsed.href;
+    }
+  }
+
   const rawBanners = env[`${PREFIX}BANNERS`];
   if (typeof rawBanners === "string" && rawBanners.trim() !== "") {
     const { banners, invalid } = parseBanners(rawBanners);
@@ -112,7 +156,8 @@ export function build(outDir, env) {
   const indexPath = join(outDir, "index.html");
   const html = readFileSync(indexPath, "utf8");
   if (!THEME_ATTR.test(html)) throw new Error("index.html の <html> に data-theme がありません");
-  writeFileSync(indexPath, html.replace(THEME_ATTR, `$1${config.theme}$2`));
+  if (!TITLE_TAG.test(html)) throw new Error("index.html に <title> がありません");
+  writeFileSync(indexPath, html.replace(THEME_ATTR, `$1${config.theme}$2`).replace(TITLE_TAG, () => headTags(config)));
   return config;
 }
 

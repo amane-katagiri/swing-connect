@@ -52,11 +52,14 @@ https://example.github.io/swing-connect/?key=npub180cvv07tjdrrgpa0j7j7tmnyl2yr6y
 | `SWING_CONNECT_CUSTOM_COLORS` | `true` | `light` / `dark` パラメータで色を変えられるか（`true` / `false`） |
 | `SWING_CONNECT_ALLOWED_KEYS` | （空） | 表示を許す公開鍵。npub・nprofile・hex をスペースかカンマで区切る |
 | `SWING_CONNECT_SWING_URL` | `https://github.com/amane-katagiri/swing` | 「SWING をインストールする」のリンク先 |
+| `SWING_CONNECT_SITE_URL` | （空。GitHub Pages では Pages の URL） | 公開先の URL。リンクを貼ったときのプレビュー画像（`og:image`）の絶対 URL に使う。空なら画像なしで見出しと説明文だけを出す |
 | `SWING_CONNECT_BANNERS` | `assets/swing-banner.gif` | リンク作成画面で配るバナー画像。http(s) の URL か、サイト内の相対パス（`assets/foo.gif` など）をカンマで区切る。`,` だけにするとバナーを出さない |
 
 `SWING_CONNECT_ALLOWED_KEYS` が空ならどの公開鍵でも表示します。公開鍵を書くと、それ以外の公開鍵のリンクはエラーになります。1 つだけ書くと、`key` を付けずに開いたときもその公開鍵のページになるので、自分専用のページとして `?key=…` なしでリンクできます。
 
 値が正しくない（色の形式が違う・公開鍵を読めないなど）と、ビルドはどの変数が悪いかを表示して失敗します。
+
+ビルドすると、`SWING_CONNECT_TITLE` と `SWING_CONNECT_DESCRIPTION` がページの `<title>` と、SNS やチャットにリンクを貼ったときのプレビュー（OGP）に入ります。プレビューの画像は星空にロゴを置いた `assets/og/og.png` です。プレビューを読むサービスは JavaScript を動かさないので、どの `?key=…` のリンクでも同じプレビューになります。
 
 ### GitHub Pages で公開する
 

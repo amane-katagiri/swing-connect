@@ -7,6 +7,7 @@ export default Object.freeze({
   darkColor: "#7dff3c",
   customColors: true,
   allowedKeys: [],
+  siteUrl: "",
   swingUrl: "https://github.com/amane-katagiri/swing",
   banners: ["assets/swing-banner.gif"],
 });

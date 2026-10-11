@@ -17,3 +17,5 @@ swing-connect（SWING でサイトをミラーしてもらうためのリンク�
 - ページ上の呼び方をそろえる（「デスクトップ画面」「トレイユーティリティ」など）。
 - `assets/slides/` と `assets/og/` から `dist/` に入るのは直下の PNG だけ。`src/`（撮影用の HTML・スクリプト・フォント）と `README.md` は公開しない。
 - ドキュメントに環境依存の情報（特定マシンの絶対パス・デモの鍵・ユーザー名など）を書かない。
+- 絵文字のフィンガープリントは SWING と同じ値を出す。一覧（`lib/emoji.js`）と画像（`assets/emoji/`）は SWING の `web/emoji/list.txt`・`web/emoji.svg`・`web/emoji/LICENSE-twemoji.txt` から `node tools/import-emoji.mjs <SWING のリポジトリ>` で作る。手で直さない。SWING 側の一覧や Twemoji の版が変わったら作り直す。
+- 配信するファイルの名前に `fingerprint` などのトラッキング対策のフィルタに当たる語を入れない（広告ブロッカーがモジュールの読み込みを止めてページが動かなくなる）。

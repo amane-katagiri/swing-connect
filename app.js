@@ -1,4 +1,5 @@
 import config from "./config.js";
+import { emojiChar, fingerprint } from "./lib/key-emoji.js";
 import { npubFromHex, parseKey } from "./lib/nip19.js";
 import { bannerFileName, palette, parseAllowedKeys, parseBannerEntry, parseColor, parseNip05Param, parseTheme, resolveKey } from "./lib/validate.js";
 
@@ -339,6 +340,32 @@ function setupSlides() {
   }
 }
 
+async function showFingerprint(target, hex, current) {
+  const ids = await fingerprint(hex);
+  if (!ids || !current()) return;
+  const chars = ids.map(emojiChar).join(" ");
+  const pill = target.classList.contains("fingerprint") ? target : document.createElement("span");
+  pill.className = "fingerprint";
+  pill.setAttribute("role", "img");
+  pill.setAttribute("aria-label", chars);
+  pill.title = `絵文字のフィンガープリント ${chars}（SWING のダッシュボードと同じ並びです。見分けるための目印で、本人の証明ではありません。公開鍵で確かめてください）`;
+  pill.replaceChildren(...ids.map((id) => {
+    const img = document.createElement("img");
+    img.src = `assets/emoji/${id}.svg`;
+    img.alt = "";
+    img.width = 16;
+    img.height = 16;
+    return img;
+  }));
+  pill.hidden = false;
+  if (pill === target) {
+    pill.closest(".badge").hidden = false;
+    return;
+  }
+  target.querySelector(".fingerprint")?.remove();
+  target.append(pill);
+}
+
 function showConnect(hex, params) {
   delete document.documentElement.dataset.scheme;
   const npub = npubFromHex(hex);
@@ -347,6 +374,7 @@ function showConnect(hex, params) {
   $("description").textContent = config.description;
   $("npub").textContent = npub;
   $("hex").textContent = hex;
+  showFingerprint($("fingerprint"), hex, () => true);
   $("command").textContent = `swing mirror add ${npub}`;
   $("swing-link").href = swingUrl;
   $("counter").textContent = String((parseInt(hex.slice(0, 8), 16) % 900000) + countVisit(hex)).padStart(6, "0");
@@ -508,6 +536,8 @@ function showBuilder(error, params) {
       } else {
         keyInput.removeAttribute("aria-invalid");
         setMsg("b-key-msg", "ok", `✓ ${npubFromHex(hex)}`);
+        const shown = hex;
+        showFingerprint($("b-key-msg"), hex, () => parseKey(keyInput.value.trim()) === shown);
       }
     }
 

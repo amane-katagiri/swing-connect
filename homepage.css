@@ -343,6 +343,24 @@ html[data-theme="homepage"] {
   color: #ffffff;
 }
 
+[data-theme="homepage"] .fingerprint {
+  gap: 2px;
+  padding: 2px 4px;
+  border: 1px solid var(--hp-panel-border);
+  border-radius: 0;
+  background: var(--hp-column);
+}
+
+[data-theme="homepage"] .badge.badge-text {
+  padding-left: 6px;
+}
+
+[data-theme="homepage"] .badge .fingerprint {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
 [data-theme="homepage"] .badge {
   gap: 6px;
   padding: 2px 6px 2px 2px;

@@ -5,6 +5,7 @@
 SWING は Nostr と IPFS で個人サイトをおたがいに保存しあうソフトウェアです。誰かのサイトをミラーするには、その人の Nostr の公開鍵を `swing mirror add <公開鍵>` か、ダッシュボードの「ミラーに追加」で登録します。swing-connect のページは、リンクに書かれた公開鍵と、その登録のしかたを表示します。
 
 - 公開鍵（npub）をコピーするボタンと、hex 形式の表示
+- SWING のダッシュボードと同じ、公開鍵から決まる 4 つの絵文字（フィンガープリント）。見分けるための目印で、本人の証明ではありません
 - `swing mirror add <npub>` のコマンド
 - ダッシュボードからミラーする手順のスライド
 - NIP-05 のドメインを渡すと、そのドメインに登録された公開鍵と一致するかを確かめて表示
@@ -108,3 +109,5 @@ node --test
 [MIT](LICENSE)
 
 `assets/fonts/` の PixelMplus12 は M+ FONT LICENSE です（[`assets/fonts/LICENSE-PixelMplus.txt`](assets/fonts/LICENSE-PixelMplus.txt)）。
+
+`assets/emoji/` の絵文字のフィンガープリントは Twemoji の画像（Twemoji graphics by Twitter, Inc and other contributors、CC-BY 4.0、[`assets/emoji/LICENSE-twemoji.txt`](assets/emoji/LICENSE-twemoji.txt)、<https://github.com/jdecked/twemoji>）です。

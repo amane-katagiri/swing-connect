@@ -281,6 +281,46 @@ p {
   margin-bottom: var(--space-3);
 }
 
+.key-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+}
+
+.fingerprint {
+  display: inline-flex;
+  flex: none;
+  gap: 3px;
+  padding: 3px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-sunk);
+  line-height: 1;
+}
+
+.fingerprint img {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.badge.badge-text {
+  padding-left: var(--space-3);
+}
+
+.badge .fingerprint {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.field-msg .fingerprint {
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+
 .eyebrow {
   display: inline-block;
   font-size: 13px;

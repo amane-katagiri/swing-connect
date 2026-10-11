@@ -13,11 +13,13 @@ test("the list has 256 distinct single code points, each with an image", () => {
   }
 });
 
-test("the fingerprint matches SWING for a known key", async () => {
-  assert.deepEqual(
-    await fingerprint("79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"),
-    ["1f43c", "1f421", "1f33f", "1f52e"],
-  );
+test("the fingerprint matches the test vectors of the SWING spec", async () => {
+  const vectors = [
+    ["79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", ["1f43c", "1f421", "1f33f", "1f52e"]],
+    ["3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d", ["1f981", "1f3a0", "1f94c", "1f36f"]],
+    ["2b9404067c270c5fccd0c249778bd27c432672acbd0a41f773868b4e6a01722c", ["1f422", "1f36b", "1f3ae", "1f363"]],
+  ];
+  for (const [hex, expected] of vectors) assert.deepEqual(await fingerprint(hex), expected, hex);
 });
 
 test("a malformed key has no fingerprint", async () => {

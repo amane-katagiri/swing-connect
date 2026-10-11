@@ -155,7 +155,7 @@ async function showNip05(raw, hex) {
   } else if (result.state === "mismatch") {
     setBadge("mismatch", "一致しません");
     $("nip05-alert-text").textContent = result.found
-      ? `${domain} に登録されている公開鍵は、このページの公開鍵と違います。リンクを書き換えられている可能性があります。ミラーに追加する前に、作者のサイトなど別の経路で公開鍵を確かめてください。`
+      ? `${domain} に登録されている公開鍵は、このページからミラーできるアカウントの公開鍵と異なります。受け取ったリンクが古いか、第三者が意図しないアカウントをミラーに追加させようとしている可能性があります。ミラーに追加する前に、作者のサイトなど信頼できる経路で公開鍵を確かめてください。`
       : `${domain} には _ の公開鍵が登録されていません。ミラーに追加する前に、作者のサイトなど別の経路で公開鍵を確かめてください。`;
     $("nip05-alert").hidden = false;
     note.hidden = true;
@@ -570,8 +570,8 @@ function showBuilder(error, params) {
     const domainBad = rawDomain !== "" && config.nip05 && !domain;
     if (hex === null || domainBad) {
       $("b-hint").textContent = hex === null
-        ? "公開鍵を入れると、リンクと HTML がここにできます。"
-        : "NIP-05 のドメインを直すと、リンクと HTML がここにできます。";
+        ? "公開鍵を入れると、リンクと HTML がここに表示されます。"
+        : "NIP-05 のドメインを直すと、リンクと HTML がここに表示されます。";
       $("b-hint").hidden = false;
       $("b-outputs").hidden = true;
       urlEl.textContent = "";
@@ -625,7 +625,7 @@ function main() {
   if (resolved.status === "ok") {
     showConnect(resolved.hex, params);
   } else if (resolved.status === "invalid") {
-    showBuilder({ title: "公開鍵を読めませんでした", text: "リンクの key に書かれた値が、npub・nprofile・64 文字の hex のどれとしても読めません。リンクを作った人に確かめるか、下で作り直してください。" }, params);
+    showBuilder({ title: "公開鍵を読めませんでした", text: "リンクの key に書かれた値が、npub・nprofile・64 文字の hex のいずれの形式とも異なります。リンクを作った人に確かめるか、下で作り直してください。" }, params);
   } else if (resolved.status === "not-allowed") {
     showBuilder({ title: "このページでは使えない公開鍵です", text: "このページは、決められた公開鍵だけを表示するように設定されています。" }, params);
   } else {
